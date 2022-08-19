@@ -77,9 +77,9 @@ def print_hi():
     tmp_address = []
     tmp_others = []
     tmp_others_list = []
-    for j in range(1, 5):
+    for j in range(1, 50):
         print("page" + str(j))
-        # for j in range(1, 3):
+        # keyword: NX UG
         turl = "https://www.104.com.tw/jobs/search/?keyword=NX%20UG&order=1&jobsource=2018indexpoc&ro=0&page=" + str(j)
         htmlfile = requests.get(turl)
         # print(htmlfile.status_code)
