@@ -14,14 +14,29 @@ from os.path import exists
 FilePath = (str(datetime.date.today()) + "-" + "company.xlsx")
 
 
-def write_others_info(others):
+def write_others_info(others_info):
     # 讀取 Excel 檔案
     wb = openpyxl.load_workbook(FilePath)
     sheet = wb['Sheet1']
     # 以行號、列號指定儲存格
-    sheet.cell(row=2, column=3).value = "test"
+    sheet.cell(row=1, column=1).value = "公司名稱"
+    sheet.cell(row=1, column=2).value = "地址"
+    sheet.cell(row=1, column=3).value = others_info[0][0]
+    sheet.cell(row=1, column=4).value = others_info[0][2]
+    sheet.cell(row=1, column=5).value = others_info[0][4]
+    sheet.cell(row=1, column=6).value = others_info[0][6]
+    sheet.cell(row=1, column=7).value = others_info[0][8]
+    sheet.cell(row=1, column=8).value = others_info[0][13]
 
-    print(others)
+    for j in range(2,len(others_info)+2):
+        sheet.cell(row=j, column=3).value = others_info[j-2][1]
+        sheet.cell(row=j, column=4).value = others_info[j-2][3]
+        sheet.cell(row=j, column=5).value = others_info[j-2][5]
+        sheet.cell(row=j, column=6).value = others_info[j-2][7]
+        sheet.cell(row=j, column=7).value = others_info[j-2][9]
+        sheet.cell(row=j, column=8).value = others_info[j-2][14]
+
+    #print(others_info[0])
     wb.save(FilePath)
     wb.close()
 
@@ -47,7 +62,6 @@ def get_company_info(xurl):
                 objstag[i].text  # .split("產業類別")[1].split("產業描述")[0]
                 tmp_str.append(objstag[i].text)
 
-                #print("=========================== end   ===========================")
     return tmp_str
 
 
@@ -63,8 +77,8 @@ def print_hi():
     tmp_address = []
     tmp_others = []
     tmp_others_list = []
-    for j in range(1, 2):
-        print(j)
+    for j in range(1, 5):
+        print("page" + str(j))
         # for j in range(1, 3):
         turl = "https://www.104.com.tw/jobs/search/?keyword=NX%20UG&order=1&jobsource=2018indexpoc&ro=0&page=" + str(j)
         htmlfile = requests.get(turl)
@@ -85,13 +99,7 @@ def print_hi():
                     tmp_name_target.append(objstag[i].text.rstrip())
                     tmp_address.append(str(objstag[i]).split("公司住址：")[1].split('">')[0])
                     tmp_others=get_company_info("https:" + str(objstag[i]).split('" target=')[0].split('href="')[1])
-
-                    # get_company_info("https:"+str(objstag[i]).split('" target=')[0].split('href="')[1])
-                    # print(objstag[i].text.rstrip())
-    # print(list(zip(tmp_name_target,tmp_address)))
-            tmp_others_list = tmp_others[0].split("  ")
-            #print(tmp_others_list)
-            print(len(tmp_name_target))
+                    tmp_others_list.append(tmp_others[0].split("  "))
 
     final_target = pandas.Series(tmp_address, index=tmp_name_target)
     if file_exists is True:
