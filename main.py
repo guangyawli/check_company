@@ -4,15 +4,30 @@
 # Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
 
 
-import bs4
-import requests
-import pandas
-import openpyxl
-import datetime
+from bs4 import BeautifulSoup
+from requests import get
+from pandas import ExcelWriter,Series
+from openpyxl import load_workbook
 from os.path import exists
+from urllib import parse
+
 
 FilePath = ("final_company.xlsx")
 final_column_len = 0
+keyfile = "key.txt"
+
+def get_key_word():
+    kdata = ""
+    keyfile_exists = exists(keyfile)
+    if keyfile_exists:
+        with open(keyfile, 'r',encoding='utf-8') as f:
+            kdata = f.readline()
+    else:
+        kdata = "NX UG"
+
+    url_code_name = urllib.parse.quote(kdata)
+    #print(data)
+    return url_code_name
 
 
 def write_more_info(old_names,name_list, address_list, others_info):
@@ -69,6 +84,10 @@ def write_others_info(others_info):
 
 
 def get_company_info(xurl):
+    theader = {"content-type": "text/html; charset=UTF-8",
+               "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36(KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
+    }
+
     tmp_str = []
     htmlfile2 = requests.get(xurl)
     # print(htmlfile.status_code)
@@ -96,6 +115,11 @@ def print_hi():
     file_exists = exists(FilePath)
     max_col = 0
     old_datas = []
+    
+    #get key word
+    key_data = get_key_word()
+    #print(key_data)
+
     if file_exists is True:
         ExcelWorkbook = openpyxl.load_workbook(FilePath)
         writer = pandas.ExcelWriter(FilePath, engine='openpyxl')
@@ -113,10 +137,10 @@ def print_hi():
     tmp_address = []
     tmp_others = []
     tmp_others_list = []
-    for j in range(1, 50):
+    for j in range(1, 100):
         print("page" + str(j))
         # keyword: NX UG
-        turl = "https://www.104.com.tw/jobs/search/?keyword=NX%20UG&order=1&jobsource=2018indexpoc&ro=0&page=" + str(j)
+        turl = "https://www.104.com.tw/jobs/search/?keyword="+ key_data +"&order=1&jobsource=2018indexpoc&ro=0&page=" + str(j)
         htmlfile = requests.get(turl)
         # print(htmlfile.status_code)
         # print(htmlfile.text)
@@ -142,9 +166,8 @@ def print_hi():
     if file_exists is True:
         writer.close()
         final_column_len = len(tmp_name_target)
-        #print(final_column_len)
+        #print("new："+ str(final_column_len-1))
         if final_column_len > 0:
-            print("new_company："+ str(final_column_len-1))
             write_more_info(old_datas, tmp_name_target, tmp_address,  tmp_others_list)
 
 
